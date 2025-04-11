@@ -1,0 +1,127 @@
+/* Custom Animated Gradient Background */
+.content-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    background: linear-gradient(135deg, #fbdefb 10%, #faf6fa 10%, #fbdefb 10%); /* Changed to lighter, professional colors */
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem auto;
+    box-shadow: 0 10px 30px rgba(128, 222, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+body {
+    background: linear-gradient(to right, white, #e3fdfd, white ); /* Light pastel gradient */
+    color: #333; /* Dark gray text for readability */
+    transition: background 0.4s ease, color 0.4s ease;
+}
+
+.content-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 20%, rgba(255, 255, 255, 0.1) 50%, transparent 80%);
+    animation: shine 6s infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-50%) translateY(-50%) rotate(45deg); }
+    100% { transform: translateX(150%) translateY(150%) rotate(45deg); }
+}
+
+/* Card Hover Effect */
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+    box-shadow: 0 8px 32px rgba(128, 222, 234, 0.15);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 45px rgba(128, 222, 234, 0.3);
+}
+
+/* Animated Buttons */
+.btn-dashboard {
+    background: linear-gradient(45deg, #4db9eb, #45cad6); /* Changed to lighter, professional colors */
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-dashboard::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 20%, rgba(255, 255, 255, 0.3) 50%, transparent 80%);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+}
+
+.btn-dashboard:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(128, 222, 234, 0.4);
+}
+
+.btn-dashboard:hover::after {
+    animation: shine 1.5s;
+}
+
+/* Text Animation */
+h2 {
+    color: white;
+    font-size: 2.5rem;
+    background: linear-gradient(45deg, #000000, #09405a);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    animation: textSlide 1s ease
+}
+
+@keyframes textSlide {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Hover Effects for Links */
+a:not(.btn) {
+    color: #4FC3F7; /* Changed to lighter, professional colors */
+    position: relative;
+    text-decoration: none;
+}
+
+a:not(.btn)::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background: #4FC3F7;
+    transition: width 0.3s ease;
+}
+
+a:not(.btn):hover::after {
+    width: 100%;
+}

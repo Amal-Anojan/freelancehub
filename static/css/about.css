@@ -1,0 +1,91 @@
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #4f46e5;
+    --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+body {
+    background: linear-gradient(to right, white, #e3fdfd, white ); /* Light pastel gradient */
+    color: #333; /* Dark gray text for readability */
+    transition: background 0.4s ease, color 0.4s ease;
+}
+
+.about-header {
+    background: var(--gradient);
+    padding: 6rem 0;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-header::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: -10%;
+    width: 120%;
+    height: 100px;
+    background: white;
+    transform: rotate(3deg);
+}
+
+.feature-card {
+    border: none;
+    border-radius: 15px;
+    padding: 2rem;
+    transition: all 0.3s;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.timeline {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    background: #6366f1;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -3px;
+}
+
+.cta-section {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    padding: 4rem 0;
+    border-radius: 20px;
+}
+
+.hover-zoom {
+    transition: transform 0.3s;
+}
+
+.hover-zoom:hover {
+    transform: scale(1.05);
+}
+
+@media screen and (max-width: 768px) {
+    .timeline::after {
+        left: 31px;
+    }
+}
+
+.floating-animation {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
