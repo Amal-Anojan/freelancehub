@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}FreelanceHub{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ username }}!</h2>
+<p>You are successfully logged in.</p>
+
+<div class="links">
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+{% endblock %}

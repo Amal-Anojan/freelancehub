@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Client Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2">
+                                <i class="fas fa-building me-2"></i>Welcome back, {{ current_user.username }}!
+                            </h2>
+                            <p class="mb-0">Manage your projects and find the perfect freelancers for your needs.</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ url_for('post_project') }}" class="btn btn-light btn-lg">
+                                <i class="fas fa-plus-circle me-2"></i>Post New Project
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-briefcase fa-2x"></i>
+                    </div>
+                    <h4 class="text-primary">{{ projects|length }}</h4>
+                    <p class="text-muted mb-0">Total Projects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="text-success mb-2">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <h4 class="text-success">{{ projects|selectattr("status", "equalto", "completed")|list|length }}</h4>
+                    <p class="text-muted mb-0">Completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-spinner fa-2x"></i>
+                    </div>
+                    <h4 class="text-warning">{{ projects|selectattr("status", "equalto", "in_progress")|list|length }}</h4>
+                    <p class="text-muted mb-0">In Progress</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="text-info mb-2">
+                        <i class="fas fa-envelope fa-2x"></i>
+                    </div>
+                    <h4 class="text-info">{{ recent_messages|length }}</h4>
+                    <p class="text-muted mb-0">New Messages</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- My Projects -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-briefcase me-2"></i>My Projects
+                    </h5>
+                    <a href="{{ url_for('post_project') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i>New Project
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if projects %}
+                        {% for project in projects %}
+                        <div class="project-card card mb-3">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6 class="fw-bold mb-2">{{ project.title }}</h6>
+                                        <p class="text-muted mb-2">{{ project.description[:100] }}...</p>
+                                        <div class="mb-2">
+                                            {% for skill in project.get_skills_required_list()[:3] %}
+                                            <span class="skills-badge">{{ skill }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>Posted {{ project.created_at.strftime('%B %d, %Y') }}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4 text-md-end">
+                                        <div class="mb-2">
+                                            <span class="status-badge status-{{ project.status.replace('_', '-') }}">
+                                                {{ project.status.replace('_', ' ').title() }}
+                                            </span>
+                                        </div>
+                                        {% if project.budget %}
+                                        <div class="fw-bold text-success mb-2">${{ "%.0f"|format(project.budget) }}</div>
+                                        {% endif %}
+                                        <div class="btn-group-vertical btn-group-sm">
+                                            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
+                                            {% if project.status == 'open' %}
+                                            <a href="{{ url_for('edit_project', project_id=project.id) }}" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No projects yet</h5>
+                            <p class="text-muted">Start by posting your first project to connect with talented freelancers.</p>
+                            <a href="{{ url_for('post_project') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Post Your First Project
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Profile Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-user me-2"></i>Profile Summary
+                    </h6>
+                </div>
+                <div class="card-body text-center">
+                    <div class="profile-avatar mx-auto mb-3">
+                        {{ current_user.username[0].upper() }}
+                    </div>
+                    <h6 class="fw-bold">{{ current_user.username }}</h6>
+                    {% if profile %}
+                        <p class="text-muted mb-2">{{ profile.company_name }}</p>
+                        {% if profile.location %}
+                        <small class="text-muted">
+                            <i class="fas fa-map-marker-alt me-1"></i>{{ profile.location }}
+                        </small>
+                        {% endif %}
+                    {% endif %}
+                    <div class="mt-3">
+                        <a href="{{ url_for('client_profile', user_id=current_user.id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Messages -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>Recent Messages
+                    </h6>
+                    <a href="{{ url_for('messages') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_messages %}
+                        {% for message in recent_messages %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="profile-avatar me-3" style="width: 40px; height: 40px; font-size: 1rem;">
+                                {{ message.sender.username[0].upper() }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-bold">{{ message.sender.username }}</h6>
+                                <p class="mb-1 text-muted small">{{ message.subject }}</p>
+                                <small class="text-muted">{{ message.created_at.strftime('%b %d') }}</small>
+                            </div>
+                            {% if not message.is_read %}
+                            <span class="badge bg-primary">New</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-envelope fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No messages yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('browse_freelancers') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-users me-2"></i>Browse Freelancers
+                        </a>
+                        <a href="{{ url_for('post_project') }}" class="btn btn-outline-success">
+                            <i class="fas fa-plus-circle me-2"></i>Post Project
+                        </a>
+                        <a href="{{ url_for('messages') }}" class="btn btn-outline-info">
+                            <i class="fas fa-envelope me-2"></i>Messages
+                        </a>
+                        <a href="{{ url_for('client_profile', user_id=current_user.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-user me-2"></i>My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

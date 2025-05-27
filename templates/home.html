@@ -1,72 +1,183 @@
-{% extends "base.html" %}
-{% block navbar %}{% endblock %}
-
+{% extends "base.html" %} {% block title %}Welcome to FreelanceHub{% endblock %}
 {% block content %}
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/home.css') }}"
-      />
-    
-
-    <div class="content-section">
-      <h2 class="text-center mb-4">Welcome to FreelanceHub</h2>
-      <p class="text-center text-dark mb-4">
-        Join us today to connect, create, and collaborate!
-      </p>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card p-4">
-          <h2 class="text-center mb-4 animate__animated animate__fadeInDown">
-            Start Your Journey
-          </h2>
-          <p class="text-center mb-4 text-dark">Choose your path to success</p>
-          <div class="text-center">
-            <a href="{{ url_for('about') }}" class="btn btn-dashboard mt-2">
-              <i class="fas fa-code me-2"></i>Freelancer Sign Up
-            </a>
-            <a href="{{ url_for('login') }}" class="btn btn-dashboard mt-2">
-              <i class="fas fa-briefcase me-2"></i>Client Sign Up
-            </a>
-          </div>
-          <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="display-4 fw-bold mb-4">
+          Find the Perfect Freelancer for Your Project
+        </h1>
+        <p class="lead mb-4">
+          Connect with talented professionals from around the world. Post your
+          project and get quality proposals from experienced freelancers.
+        </p>
+        <div class="d-flex gap-3">
+          {% if not current_user.is_authenticated %}
+          <a class="btn btn-light btn-lg" href="{{ url_for('register') }}">
+            <i class="fas fa-user-plus me-2"></i>Get Started
+          </a>
+          <a class="btn btn-outline-light btn-lg" href="{{ url_for('login') }}">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+          </a>
+          {% else %}
+          <a class="btn btn-light btn-lg" href="{{ url_for('dashboard') }}">
+            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+          </a>
+          <a
+            class="btn btn-outline-light btn-lg"
+            href="{{ url_for('browse_freelancers') }}"
+          >
+            <i class="fas fa-users me-2"></i>Browse Freelancers
+          </a>
+          {% endif %}
+        </div>
       </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-          <hr class="my-4" />
-          <p class="text-center mb-0 text-dark">
-            Already have an account?
-            <a href="{{ url_for('home') }}" class="fw-bold">Sign In Now</a>
-          </p>
+      <div class="col-lg-6">
+        <div class="text-center">
+          <i
+            class="fas fa-laptop-code"
+            style="font-size: 15rem; opacity: 0.1"
+          ></i>
         </div>
       </div>
     </div>
-
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='js/home.js') }}"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+  </div>
+</section>
+<!-- Features Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="fw-bold mb-3">Why Choose FreelanceHub?</h2>
+        <p class="lead text-muted">
+          The best platform to connect talent with opportunity
+        </p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 text-center border-0">
+          <div class="card-body">
+            <div class="text-primary mb-3">
+              <i class="fas fa-users fa-3x"></i>
+            </div>
+            <h5 class="card-title">Quality Freelancers</h5>
+            <p class="card-text">
+              Access to vetted professionals with proven track records and
+              verified skills.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 text-center border-0">
+          <div class="card-body">
+            <div class="text-primary mb-3">
+              <i class="fas fa-shield-alt fa-3x"></i>
+            </div>
+            <h5 class="card-title">Secure Platform</h5>
+            <p class="card-text">
+              Safe and secure transactions with built-in protection for both
+              clients and freelancers.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 text-center border-0">
+          <div class="card-body">
+            <div class="text-primary mb-3">
+              <i class="fas fa-clock fa-3x"></i>
+            </div>
+            <h5 class="card-title">24/7 Support</h5>
+            <p class="card-text">
+              Round-the-clock customer support to help you with any questions or
+              issues.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Categories Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="fw-bold mb-3">Popular Categories</h2>
+        <p class="lead text-muted">Find freelancers in your field</p>
+      </div>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 border-0 category-card">
+          <div class="card-body text-center">
+            <i class="fas fa-code text-primary fa-2x mb-3"></i>
+            <h6 class="card-title">Web Development</h6>
+            <small class="text-muted">500+ freelancers</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 border-0 category-card">
+          <div class="card-body text-center">
+            <i class="fas fa-paint-brush text-primary fa-2x mb-3"></i>
+            <h6 class="card-title">Graphic Design</h6>
+            <small class="text-muted">300+ freelancers</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 border-0 category-card">
+          <div class="card-body text-center">
+            <i class="fas fa-chart-bar text-primary fa-2x mb-3"></i>
+            <h6 class="card-title">Data Science</h6>
+            <small class="text-muted">200+ freelancers</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 border-0 category-card">
+          <div class="card-body text-center">
+            <i class="fas fa-mobile-alt text-primary fa-2x mb-3"></i>
+            <h6 class="card-title">Mobile Apps</h6>
+            <small class="text-muted">150+ freelancers</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- CTA Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center">
+        <div class="bg-primary text-white rounded p-5">
+          <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+          <p class="lead mb-4">
+            Join thousands of freelancers and clients on FreelanceHub
+          </p>
+          {% if not current_user.is_authenticated %}
+          <a class="btn btn-light btn-lg me-3" href="{{ url_for('register') }}">
+            <i class="fas fa-user-plus me-2"></i>Sign Up Free
+          </a>
+          <a
+            class="btn btn-outline-light btn-lg"
+            href="{{ url_for('browse_freelancers') }}"
+          >
+            <i class="fas fa-search me-2"></i>Browse Talent
+          </a>
+          {% else %}
+          <a class="btn btn-light btn-lg" href="{{ url_for('dashboard') }}">
+            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

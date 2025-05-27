@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-envelope me-2"></i>My Messages</h2>
+            <p class="text-muted">Manage your conversations with clients and freelancers</p>
+        </div>
+    </div>
+
+    <!-- Message Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="messageTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab">
+                        <i class="fas fa-inbox me-1"></i>Received ({{ received_messages|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button" role="tab">
+                        <i class="fas fa-paper-plane me-1"></i>Sent ({{ sent_messages|length }})
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tab-content" id="messageTabContent">
+        <!-- Received Messages -->
+        <div class="tab-pane fade show active" id="received" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    {% if received_messages %}
+                        <div class="list-group list-group-flush">
+                            {% for message in received_messages %}
+                            <div class="list-group-item {% if not message.is_read %}bg-light{% endif %}">
+                                <div class="d-flex w-100 justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="profile-avatar me-3" style="width: 40px; height: 40px; font-size: 1rem;">
+                                                {{ message.sender.username[0].upper() }}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    <a href="{{ url_for('view_message', message_id=message.id) }}" class="text-decoration-none">
+                                                        {{ message.subject }}
+                                                    </a>
+                                                    {% if not message.is_read %}
+                                                        <span class="badge bg-primary ms-2">New</span>
+                                                    {% endif %}
+                                                </h6>
+                                                <p class="mb-1 text-muted">From: 
+                                                    <a href="{% if message.sender.user_type == 'freelancer' %}{{ url_for('freelancer_profile', user_id=message.sender.id) }}{% else %}{{ url_for('client_profile', user_id=message.sender.id) }}{% endif %}" class="text-decoration-none">
+                                                        {{ message.sender.username }}
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <p class="mb-2 text-muted">{{ message.content[:100] }}{% if message.content|length > 100 %}...{% endif %}</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted">{{ message.created_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                                        <div class="mt-2">
+                                            <a href="{{ url_for('view_message', message_id=message.id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
+                                            <a href="{{ url_for('send_message', receiver_id=message.sender.id) }}" class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-reply me-1"></i>Reply
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No messages received yet</h5>
+                            <p class="text-muted">Your received messages will appear here</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sent Messages -->
+        <div class="tab-pane fade" id="sent" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    {% if sent_messages %}
+                        <div class="list-group list-group-flush">
+                            {% for message in sent_messages %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="profile-avatar me-3" style="width: 40px; height: 40px; font-size: 1rem;">
+                                                {{ message.receiver.username[0].upper() }}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    <a href="{{ url_for('view_message', message_id=message.id) }}" class="text-decoration-none">
+                                                        {{ message.subject }}
+                                                    </a>
+                                                </h6>
+                                                <p class="mb-1 text-muted">To: 
+                                                    <a href="{% if message.receiver.user_type == 'freelancer' %}{{ url_for('freelancer_profile', user_id=message.receiver.id) }}{% else %}{{ url_for('client_profile', user_id=message.receiver.id) }}{% endif %}" class="text-decoration-none">
+                                                        {{ message.receiver.username }}
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <p class="mb-2 text-muted">{{ message.content[:100] }}{% if message.content|length > 100 %}...{% endif %}</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted">{{ message.created_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                                        <div class="mt-2">
+                                            <a href="{{ url_for('view_message', message_id=message.id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-paper-plane fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No messages sent yet</h5>
+                            <p class="text-muted">Your sent messages will appear here</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

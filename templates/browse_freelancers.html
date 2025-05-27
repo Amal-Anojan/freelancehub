@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Freelancers{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-users me-2"></i>Browse Freelancers</h2>
+            <p class="text-muted">Find the perfect freelancer for your project</p>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('browse_freelancers') }}">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label for="search" class="form-label">Search</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       value="{{ search }}" placeholder="Search by skills, title, or description">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="skill" class="form-label">Skill Filter</label>
+                                <input type="text" class="form-control" id="skill" name="skill" 
+                                       value="{{ skill_filter }}" placeholder="e.g., Python, React">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="experience" class="form-label">Experience Level</label>
+                                <select class="form-select" id="experience" name="experience">
+                                    <option value="">All Levels</option>
+                                    <option value="Beginner" {% if experience_filter == 'Beginner' %}selected{% endif %}>Beginner</option>
+                                    <option value="Intermediate" {% if experience_filter == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+                                    <option value="Expert" {% if experience_filter == 'Expert' %}selected{% endif %}>Expert</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Freelancers List -->
+    <div class="row">
+        {% if freelancers %}
+            {% for freelancer_data in freelancers %}
+                {% set freelancer = freelancer_data.profile %}
+                {% set avg_rating = freelancer_data.avg_rating %}
+                {% set total_ratings = freelancer_data.total_ratings %}
+                
+                <div class="col-12 mb-4">
+                    <div class="freelancer-post">
+                        <div class="row">
+                            <div class="col-md-2 text-center">
+                                <div class="profile-avatar mx-auto mb-3">
+                                    {{ freelancer.user.username[0].upper() }}
+                                </div>
+                                <div class="rating-stars">
+                                    {% for i in range(5) %}
+                                        {% if i < avg_rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <small class="d-block text-muted">{{ avg_rating }}/5 ({{ total_ratings }} reviews)</small>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <h4 class="mb-2">
+                                    <a href="{{ url_for('freelancer_profile', user_id=freelancer.user_id) }}" 
+                                       class="text-decoration-none">{{ freelancer.title }}</a>
+                                </h4>
+                                <h6 class="text-primary mb-2">{{ freelancer.user.username }}</h6>
+                                
+                                <p class="text-muted mb-3">
+                                    {{ freelancer.description[:200] }}{% if freelancer.description|length > 200 %}...{% endif %}
+                                </p>
+                                
+                                <div class="mb-3">
+                                    {% for skill in freelancer.get_skills_list()[:6] %}
+                                        <span class="skills-badge">{{ skill }}</span>
+                                    {% endfor %}
+                                    {% if freelancer.get_skills_list()|length > 6 %}
+                                        <span class="skills-badge">+{{ freelancer.get_skills_list()|length - 6 }} more</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="row text-muted small">
+                                    <div class="col-md-6">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        {{ freelancer.location or 'Location not specified' }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ freelancer.availability }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-2 text-end">
+                                {% if freelancer.hourly_rate %}
+                                    <h5 class="text-success mb-3">${{ "%.0f"|format(freelancer.hourly_rate) }}/hr</h5>
+                                {% endif %}
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('freelancer_profile', user_id=freelancer.user_id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View Profile
+                                    </a>
+                                    {% if current_user.user_type == 'client' %}
+                                        <a href="{{ url_for('send_message', receiver_id=freelancer.user_id) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-envelope me-1"></i>Contact
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                    <h3 class="text-muted">No freelancers found</h3>
+                    <p class="text-muted">Try adjusting your search criteria</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

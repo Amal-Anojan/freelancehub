@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Choose Your Role{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Welcome to FreelanceHub!</h2>
+                <p class="lead text-muted">Choose how you'd like to get started</p>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Freelancer Option -->
+                <div class="col-md-6">
+                    <div class="card h-100 text-center p-4 border-primary">
+                        <div class="card-body d-flex flex-column">
+                            <i class="fas fa-user-tie fa-4x text-primary mb-4"></i>
+                            <h4 class="card-title mb-3">Join as a Freelancer</h4>
+                            <p class="card-text mb-4">Showcase your skills, find exciting projects, and build your freelance career.</p>
+                            
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">What you can do:</h6>
+                                <ul class="list-unstyled text-start">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Create a professional profile</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Showcase your portfolio</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Receive project offers</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Build your reputation</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Get paid securely</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <a href="{{ url_for('register_freelancer') }}" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-arrow-right me-2"></i>Continue as Freelancer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Client Option -->
+                <div class="col-md-6">
+                    <div class="card h-100 text-center p-4 border-success">
+                        <div class="card-body d-flex flex-column">
+                            <i class="fas fa-building fa-4x text-success mb-4"></i>
+                            <h4 class="card-title mb-3">Join as a Client</h4>
+                            <p class="card-text mb-4">Find talented freelancers, post projects, and grow your business.</p>
+                            
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">What you can do:</h6>
+                                <ul class="list-unstyled text-start">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Post unlimited projects</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Browse freelancer profiles</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Compare proposals</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Manage your team</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Rate freelancers</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <a href="{{ url_for('register_client') }}" class="btn btn-success btn-lg w-100">
+                                    <i class="fas fa-arrow-right me-2"></i>Continue as Client
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted">You can always update your profile later</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add some custom styling for this page -->
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .border-primary:hover {
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .border-success:hover {
+        border-color: #198754 !important;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }} - Client Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Profile Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <div class="profile-avatar mx-auto mb-3" style="width: 120px; height: 120px; font-size: 3rem;">
+                                {{ profile.company_name[0].upper() }}
+                            </div>
+                            <h4>{{ profile.company_name }}</h4>
+                            <p class="text-muted">{{ user.username }}</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h3 class="text-primary">{{ profile.company_name }}</h3>
+                            {% if profile.company_description %}
+                                <p class="text-muted mb-3">{{ profile.company_description }}</p>
+                            {% endif %}
+                            
+                            <div class="row mb-3">
+                                {% if profile.industry %}
+                                    <div class="col-6">
+                                        <strong>Industry:</strong><br>
+                                        <span class="text-muted">{{ profile.industry }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if profile.company_size %}
+                                    <div class="col-6">
+                                        <strong>Company Size:</strong><br>
+                                        <span class="text-muted">{{ profile.company_size }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if profile.location %}
+                                <p><i class="fas fa-map-marker-alt me-2"></i>{{ profile.location }}</p>
+                            {% endif %}
+                            
+                            {% if profile.website %}
+                                <p><i class="fas fa-globe me-2"></i>
+                                    <a href="{{ profile.website }}" target="_blank" class="text-decoration-none">{{ profile.website }}</a>
+                                </p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-3 text-end">
+                            {% if current_user.user_type == 'freelancer' %}
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('send_message', receiver_id=user.id) }}" 
+                                       class="btn btn-primary">
+                                        <i class="fas fa-envelope me-2"></i>Send Message
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-8">
+            <!-- Active Projects -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-briefcase me-2"></i>Active Projects</h5>
+                </div>
+                <div class="card-body">
+                    {% if projects %}
+                        {% for project in projects %}
+                            <div class="project-card p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="text-primary">{{ project.title }}</h6>
+                                        <p class="text-muted small mb-2">
+                                            {{ project.description[:150] }}{% if project.description|length > 150 %}...{% endif %}
+                                        </p>
+                                        
+                                        <!-- Skills Required -->
+                                        <div class="mb-2">
+                                            {% for skill in project.get_skills_required_list()[:4] %}
+                                                <span class="skills-badge">{{ skill }}</span>
+                                            {% endfor %}
+                                            {% if project.get_skills_required_list()|length > 4 %}
+                                                <span class="skills-badge">+{{ project.get_skills_required_list()|length - 4 }} more</span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="row small text-muted">
+                                            <div class="col-md-6">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Posted {{ project.created_at.strftime('%B %d, %Y') }}
+                                            </div>
+                                            {% if project.deadline %}
+                                                <div class="col-md-6">
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    Deadline: {{ project.deadline.strftime('%B %d, %Y') }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-end">
+                                        {% if project.budget %}
+                                            <h6 class="text-success">${{ "%.0f"|format(project.budget) }}</h6>
+                                        {% endif %}
+                                        <span class="status-badge status-{{ project.status.replace(' ', '-') }}">
+                                            {{ project.status.title() }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-briefcase fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No active projects</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-4">
+            <!-- Contact Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-address-card me-2"></i>Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Email:</strong><br>{{ user.email }}</p>
+                    {% if profile.phone %}
+                        <p><strong>Phone:</strong><br>{{ profile.phone }}</p>
+                    {% endif %}
+                    <p><strong>Member since:</strong><br>{{ user.created_at.strftime('%B %Y') }}</p>
+                </div>
+            </div>
+
+            <!-- Company Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar me-2"></i>Company Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ projects|length }}</h4>
+                            <small class="text-muted">Active Projects</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ user.created_at.strftime('%Y') }}</h4>
+                            <small class="text-muted">Year Joined</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

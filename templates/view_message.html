@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}View Message{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a href="{{ url_for('messages') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Messages
+                </a>
+            </div>
+
+            <!-- Message Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex align-items-center">
+                            <div class="profile-avatar me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                {% if message.sender_id == current_user.id %}
+                                    {{ message.receiver.username[0].upper() }}
+                                {% else %}
+                                    {{ message.sender.username[0].upper() }}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h5 class="mb-1">{{ message.subject }}</h5>
+                                <div class="text-muted">
+                                    {% if message.sender_id == current_user.id %}
+                                        <strong>To:</strong> 
+                                        <a href="{% if message.receiver.user_type == 'freelancer' %}{{ url_for('freelancer_profile', user_id=message.receiver.id) }}{% else %}{{ url_for('client_profile', user_id=message.receiver.id) }}{% endif %}" class="text-decoration-none">
+                                            {{ message.receiver.username }}
+                                        </a>
+                                        {% if message.receiver.user_type == 'freelancer' %}
+                                            <span class="badge bg-info ms-1">Freelancer</span>
+                                        {% else %}
+                                            <span class="badge bg-warning ms-1">Client</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <strong>From:</strong> 
+                                        <a href="{% if message.sender.user_type == 'freelancer' %}{{ url_for('freelancer_profile', user_id=message.sender.id) }}{% else %}{{ url_for('client_profile', user_id=message.sender.id) }}{% endif %}" class="text-decoration-none">
+                                            {{ message.sender.username }}
+                                        </a>
+                                        {% if message.sender.user_type == 'freelancer' %}
+                                            <span class="badge bg-info ms-1">Freelancer</span>
+                                        {% else %}
+                                            <span class="badge bg-warning ms-1">Client</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ message.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="message-content">
+                        {{ message.content|replace('\n', '<br>')|safe }}
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light">
+                    <div class="d-flex gap-2">
+                        {% if message.sender_id != current_user.id %}
+                            <a href="{{ url_for('send_message', receiver_id=message.sender.id) }}" class="btn btn-primary">
+                                <i class="fas fa-reply me-1"></i>Reply
+                            </a>
+                            {% if message.sender.user_type == 'freelancer' and current_user.user_type == 'client' %}
+                                <a href="{{ url_for('rate_freelancer', freelancer_id=message.sender.id) }}" class="btn btn-warning">
+                                    <i class="fas fa-star me-1"></i>Rate Freelancer
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ url_for('send_message', receiver_id=message.receiver.id) }}" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Send Another Message
+                            </a>
+                        {% endif %}
+                        
+                        <!-- View Profile Button -->
+                        {% set profile_user = message.sender if message.sender_id != current_user.id else message.receiver %}
+                        <a href="{% if profile_user.user_type == 'freelancer' %}{{ url_for('freelancer_profile', user_id=profile_user.id) }}{% else %}{{ url_for('client_profile', user_id=profile_user.id) }}{% endif %}" class="btn btn-outline-info">
+                            <i class="fas fa-user me-1"></i>View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

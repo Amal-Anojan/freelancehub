@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Send Message to {{ receiver.username }}</h4>
+                    <a href="{{ url_for('freelancer_profile', user_id=receiver.id) }}" class="btn btn-outline-primary btn-sm">
+                        View Profile
+                    </a>
+                </div>
+
+                <div class="card-body">
+                    {% if receiver.user_type == 'freelancer' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            You're sending a message to freelancer <strong>{{ receiver.username }}</strong>. 
+                            They will receive an email notification about your message.
+                        </div>
+                    {% elif receiver.user_type == 'client' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            You're sending a message to client <strong>{{ receiver.username }}</strong>. 
+                            They will receive an email notification about your message.
+                        </div>
+                    {% endif %}
+
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.subject.label(class="form-label") }}
+                            {{ form.subject(class="form-control") }}
+                            {% if form.subject.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.subject.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.content.label(class="form-label") }}
+                            {{ form.content(class="form-control", rows="8") }}
+                            {% if form.content.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.content.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('messages') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Messages
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: none;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}

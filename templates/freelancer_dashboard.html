@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-card">
+                <div class="welcome-content">
+                    <h2>Welcome back, {{ current_user.username }}!</h2>
+                    <p class="lead">Ready to showcase your skills and find amazing projects?</p>
+                </div>
+                <div class="welcome-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ ratings|length }}</div>
+                        <div class="stat-label">Reviews</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ "%.1f"|format(avg_rating) if avg_rating > 0 else "N/A" }}</div>
+                        <div class="stat-label">Avg Rating</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ recent_messages|length }}</div>
+                        <div class="stat-label">New Messages</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Sidebar - Profile & Quick Actions -->
+        <div class="col-lg-3 mb-4">
+            <!-- Profile Summary -->
+            <div class="card profile-card mb-4">
+                <div class="card-body text-center">
+                    <div class="profile-avatar">
+                        {{ current_user.username[0].upper() }}
+                    </div>
+                    <h5 class="mt-3">{{ current_user.username }}</h5>
+                    {% if profile %}
+                        <p class="text-muted">{{ profile.title }}</p>
+                        <div class="rating-display mb-3">
+                            {% if avg_rating > 0 %}
+                                {% for i in range(1, 6) %}
+                                    {% if i <= avg_rating %}
+                                        <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                        <i class="far fa-star text-muted"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="ms-2">{{ "%.1f"|format(avg_rating) }} ({{ ratings|length }} reviews)</span>
+                            {% else %}
+                                <span class="text-muted">No ratings yet</span>
+                            {% endif %}
+                        </div>
+                        {% if profile.hourly_rate %}
+                            <div class="hourly-rate">
+                                <strong>${{ "%.2f"|format(profile.hourly_rate) }}/hr</strong>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-danger">Profile not completed</p>
+                        <a href="{{ url_for('register_freelancer') }}" class="btn btn-primary btn-sm">Complete Profile</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6>Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('browse_projects') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-search"></i> Browse Projects
+                        </a>
+                        <a href="{{ url_for('messages') }}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-envelope"></i> Messages 
+                            {% if recent_messages|selectattr('is_read', 'equalto', false)|list|length > 0 %}
+                                <span class="badge bg-danger">{{ recent_messages|selectattr('is_read', 'equalto', false)|list|length }}</span>
+                            {% endif %}
+                        </a>
+                        {% if profile %}
+                            <a href="{{ url_for('freelancer_profile', user_id=current_user.id) }}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-user"></i> View My Profile
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Card -->
+            {% if profile %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6>My Skills</h6>
+                </div>
+                <div class="card-body">
+                    <div class="skills-container">
+                        {% for skill in profile.get_skills_list() %}
+                            <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-lg-9">
+            <!-- Recent Messages -->
+            {% if recent_messages %}
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Recent Messages</h5>
+                    <a href="{{ url_for('messages') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% for message in recent_messages[:3] %}
+                        <div class="message-item {% if not message.is_read %}unread{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        {{ message.subject }}
+                                        {% if not message.is_read %}
+                                            <span class="badge bg-primary ms-2">New</span>
+                                        {% endif %}
+                                    </h6>
+                                    <p class="mb-1 text-muted">From: {{ message.sender.username }}</p>
+                                    <p class="mb-1">{{ message.content[:100] }}{% if message.content|length > 100 %}...{% endif %}</p>
+                                    <small class="text-muted">{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </div>
+                                <a href="{{ url_for('view_message', message_id=message.id) }}" class="btn btn-sm btn-outline-primary">Read</a>
+                            </div>
+                        </div>
+                        {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Other Freelancers Feed -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Discover Other Freelancers</h5>
+                    <a href="{{ url_for('browse_freelancers') }}" class="btn btn-outline-primary btn-sm">Browse All</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for freelancer in all_freelancers[:6] %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="freelancer-card">
+                                    <div class="freelancer-header">
+                                        <div class="freelancer-avatar">
+                                            {{ freelancer.user.username[0].upper() }}
+                                        </div>
+                                        <div class="freelancer-info">
+                                            <h6 class="mb-1">{{ freelancer.user.username }}</h6>
+                                            <p class="text-muted mb-0">{{ freelancer.title }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="freelancer-details">
+                                        <p class="description">{{ freelancer.description[:100] }}{% if freelancer.description|length > 100 %}...{% endif %}</p>
+                                        
+                                        <div class="skills-preview">
+                                            {% for skill in freelancer.get_skills_list()[:3] %}
+                                                <span class="skill-tag-sm">{{ skill }}</span>
+                                            {% endfor %}
+                                            {% if freelancer.get_skills_list()|length > 3 %}
+                                                <span class="text-muted">+{{ freelancer.get_skills_list()|length - 3 }} more</span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="freelancer-stats">
+                                            <div class="stat">
+                                                <i class="fas fa-star text-warning"></i>
+                                                {% set freelancer_ratings = ratings|selectattr('freelancer_id', 'equalto', freelancer.user_id)|list %}
+                                                {% if freelancer_ratings %}
+                                                    {{ "%.1f"|format(freelancer_ratings|map(attribute='rating')|sum / freelancer_ratings|length) }}
+                                                {% else %}
+                                                    New
+                                                {% endif %}
+                                            </div>
+                                            <div class="stat">
+                                                <i class="fas fa-dollar-sign text-success"></i>
+                                                {% if freelancer.hourly_rate %}
+                                                    ${{ "%.0f"|format(freelancer.hourly_rate) }}/hr
+                                                {% else %}
+                                                    Negotiable
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="freelancer-actions">
+                                        <a href="{{ url_for('freelancer_profile', user_id=freelancer.user_id) }}" class="btn btn-outline-primary btn-sm">
+                                            View Profile
+                                        </a>
+                                        <a href="{{ url_for('send_message', receiver_id=freelancer.user_id) }}" class="btn btn-primary btn-sm">
+                                            Message
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="text-center">
+                                <p class="text-muted">No other freelancers found.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.welcome-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.profile-card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    margin: 0 auto;
+}
+
+.hourly-rate {
+    font-size: 1.25rem;
+    color: #28a745;
+}
+
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.skill-tag {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.skill-tag-sm {
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.125rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
+}
+
+.message-item {
+    padding: 1rem 0;
+}
+
+.message-item.unread {
+    background-color: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding-left: 1rem;
+    margin-left: -1rem;
+}
+
+.freelancer-card {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1.5rem;
+    height: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.freelancer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.freelancer-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.freelancer-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    margin-right: 1rem;
+}
+
+.freelancer-details {
+    margin-bottom: 1rem;
+}
+
+.description {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.skills-preview {
+    margin-bottom: 1rem;
+}
+
+.freelancer-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.freelancer-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.freelancer-actions .btn {
+    flex: 1;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .welcome-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .welcome-stats {
+        margin-top: 1rem;
+        justify-content: center;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
